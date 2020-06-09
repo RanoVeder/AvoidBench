@@ -1,3 +1,12 @@
 [submodule "Airsim"]
 	path = Airsim
 	url = https://github.com/RanoVeder/AirSim.git
+[submodule "AvoidLib/vendor/rpclib"]
+	path = AvoidLib/vendor/rpclib
+	url = https://github.com/rpclib/rpclib.git
+[submodule "AvoidLib/vendor/googletest"]
+	path = AvoidLib/vendor/googletest
+	url = https://github.com/google/googletest.git
+[submodule "Python/pybind11"]
+	path = Python/pybind11
+	url = https://github.com/pybind/pybind11

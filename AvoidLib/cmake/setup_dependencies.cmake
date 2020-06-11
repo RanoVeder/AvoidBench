@@ -22,4 +22,6 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/vendor/googletest/CMakeLists.txt")
 endif()
 
 add_subdirectory(vendor/rpclib)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 add_subdirectory(vendor/googletest)

@@ -6,11 +6,10 @@ class RPCClient{
 public:
     RPCClient(const std::string& ip, uint16_t port);
 
-    std::string GetCurrentMap();
-    std::vector<std::string> GetAvailableMaps();
-    void LoadMap(const std::string& mapName);
-    void ReloadMap();
-
+    std::string GetCurrentWorld();
+    std::vector<std::string> GetAvailableWorlds();
+    void LoadWorld(const std::string& worldName);
+    
 
 private:
     rpc::client client;

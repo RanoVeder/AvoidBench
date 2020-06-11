@@ -6,7 +6,7 @@ add_subdirectory(pybind11)
 
 add_library(avoid MODULE Avoid/Avoid.cpp)
 target_link_libraries(avoid 
-        PUBLIC AvoidLib_client
+        PUBLIC avoidlib_client
         PRIVATE pybind11::module
     )
 set_target_properties(avoid PROPERTIES 

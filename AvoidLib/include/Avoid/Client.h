@@ -4,22 +4,34 @@
 #include <vector>
 #include <memory>
 
-namespace avoid {
-    class Client {
+#include "Common.h"
+#include "World.h"
+#include "Vehicle.h"
+
+namespace avoid
+{
+
+    class Client
+    {
     public:
         Client(const std::string &ip, uint16_t port);
         ~Client();
 
-        std::string GetCurrentWorld();
         std::string GetClientVersion();
         std::string GetServerVersion();
+
+        void RunBenchmark();
+
+        World GetCurrentWorld();
         std::vector<std::string> GetAvailableWorlds();
-        void ReloadWorld();
-        void LoadWorld(const std::string& mapName);
+        World ReloadWorld();
+        World LoadWorld(const std::string &worldName);
+
+        Vehicle GetVehicle();
+
+        void SetCameraSettings(float fov);
 
     private:
-        class ClientImplementation;
-        std::unique_ptr<ClientImplementation> clientImplementation;
-        
+        std::shared_ptr<rpc::RPCClient> backend;
     };
-}
+} // namespace avoid

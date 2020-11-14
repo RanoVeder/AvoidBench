@@ -1,0 +1,34 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Avoid",
+	"Description": "Avoid module allows for remote management of the benchmark suite",
+	"Category": "Other",
+	"CreatedBy": "Rano Veder",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "Avoid",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault",
+			"AdditionalDependencies": [
+				"Engine",
+				"Airsim"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "Airsim",
+			"Enabled": true
+		}
+	]
+}

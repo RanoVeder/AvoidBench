@@ -37,3 +37,7 @@
 
 # Editor Dirs
 /.vs
+
+Unreal/AvoidUE4/Plugins/Avoid/Dependencies/include/rpc/
+
+Unreal/AvoidUE4/Plugins/Avoid/Dependencies/include/avoid/

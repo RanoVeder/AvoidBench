@@ -1,22 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Containers/Array.h"
 #include "FoliageType_InstancedStaticMesh.h"
+#include "InstancedFoliage.h"
 #include "PoissonDisc.generated.h"
 
-
-
-
 UCLASS()
-class BENCH_API APoissonDisc : public AActor
+class AVOID_API APoissonDisc : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	APoissonDisc();
 
@@ -24,40 +20,37 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
-	UFUNCTION(CallInEditor)
-		void Generate();
-
-	UPROPERTY(EditAnywhere)
-	TArray<UFoliageType_InstancedStaticMesh*> FoliageTypes;
+	UFUNCTION(CallInEditor, BlueprintCallable)
+	void Generate();
 
 	UPROPERTY(EditAnywhere)
-	AVolume* volume;
+	TArray<UFoliageType_InstancedStaticMesh *> FoliageTypes;
 
 	UPROPERTY(EditAnywhere)
-	float radius = 1;
+	AVolume *volume;
 
 	UPROPERTY(EditAnywhere)
-	int iterations = 8;
+	float radius = 200;
 
 	UPROPERTY(EditAnywhere)
-	int randomSeed;
+	int iterations = 35;
 
-
-
-	
+	UPROPERTY(EditAnywhere)
+	int randomSeed = 0;
 
 private:
+	bool FoliageTrace(const UWorld *InWorld, FHitResult &OutHit, const FDesiredFoliageInstance &DesiredInstance);
+	bool PlaceInstance(const UWorld *InWorld, const UFoliageType *Settings, FFoliageInstance &Inst, const FVector &HitLocation, const FVector &HitNormal);
 
-	void GenerateArray();
+	bool GenerateArray();
 	void GenerateLocations();
 	void PlaceInstances();
 
-	void GetGridBox(FVector2D location, int& row, int& column);
+	void GetGridBox(FVector2D location, int &row, int &column);
 	bool IsValid(FVector2D point);
 
 	TArray<int> grid;
@@ -65,7 +58,9 @@ private:
 	TArray<FVector2D> activePoints;
 	FBox boundingBox;
 
-	TArray<UFoliageInstancedStaticMeshComponent* > instances;
+	TArray<UFoliageType_InstancedStaticMesh *> oldTypes;
+	TArray<UFoliageInstancedStaticMeshComponent *> instances;
+	int counter = 0;
 
 	int currentIndex;
 	int rows;

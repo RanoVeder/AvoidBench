@@ -1,48 +1,45 @@
 #include "Avoid/Client.h"
 #include "rpc/RPCClient.h"
 
-namespace avoid{
+namespace avoid
+{
 
-    class Client::ClientImplementation {
-    public:
-        ClientImplementation(const std::string &ip, uint16_t port) : rpcClient(ip, port) {};
+    Client::Client(const std::string &ip, uint16_t port) : backend(std::make_shared<rpc::RPCClient>(ip, port)){};
+    Client::~Client() {
+        backend->CancelTasks();
+    };
 
-        std::string GetCurrentWorld() {
-            return rpcClient.GetCurrentWorld();
+    World Client::GetCurrentWorld()
+    {
+        std::string name = backend->GetCurrentWorld();
+        return World(backend, name);
+    };
+
+    std::vector<std::string> Client::GetAvailableWorlds()
+    {
+        return backend->GetAvailableWorlds();
+    };
+
+    World Client::LoadWorld(const std::string &worldName)
+    {
+        bool success = backend->LoadWorld(worldName);
+        if (success)
+        {
+            return World(backend, worldName);
         }
-
-        std::vector<std::string> GetAvailableWorlds() {
-            return rpcClient.GetAvailableWorlds();
-        };
-
-        void LoadWorld(const std::string& worldName) {
-            return rpcClient.LoadWorld(worldName);
-        };
-
-    private:
-        RPCClient rpcClient;
-
+        throw std::exception();
     };
 
-    Client::Client(const std::string &ip, uint16_t port) : clientImplementation(std::make_unique<ClientImplementation>(ip, port)) {};
-    Client::~Client() = default;
-
-    std::string Client::GetCurrentWorld() {
-        return clientImplementation->GetCurrentWorld();
+    World Client::ReloadWorld()
+    {
+        std::string name = backend->GetCurrentWorld();
+        return LoadWorld(name);
     };
 
-    std::vector<std::string> Client::GetAvailableWorlds() {
-        return clientImplementation->GetAvailableWorlds();
+
+    Vehicle Client::GetVehicle()
+    {
+        return Vehicle(backend);
     };
 
-    void Client::LoadWorld(const std::string& worldName) {
-        return clientImplementation->LoadWorld(worldName);
-    };
-
-    void Client::ReloadWorld() {
-        std::string currentWorld = GetCurrentWorld();
-        return clientImplementation->LoadWorld(currentWorld);
-    };
-
-}
-
+} // namespace avoid

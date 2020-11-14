@@ -10,6 +10,7 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"AirSim",
+				"Avoid",
 				"Engine"
 			]
 		}
@@ -17,6 +18,10 @@
 	"Plugins": [
 		{
 			"Name": "AirSim",
+			"Enabled": true
+		},
+		{
+			"Name": "Avoid",
 			"Enabled": true
 		},
 		{
@@ -34,6 +39,10 @@
 		{
 			"Name": "HoudiniNiagara",
 			"Enabled": true
+		},
+		{
+			"Name": "MobileLauncherProfileWizard",
+			"Enabled": false
 		}
 	]
 }

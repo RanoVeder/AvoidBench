@@ -1,6 +1,10 @@
 set(CLIENT_SOURCES 
     src/Client.cpp
+    src/World.cpp
+    src/Vehicle.cpp
+    src/Mission.cpp
     src/rpc/RPCClient.cpp
+    src/Benchmarking/BenchmarkingInterface.cpp
 )
 
 
@@ -16,7 +20,10 @@ target_include_directories(${PROJECT_NAME}_client
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
         $<INSTALL_INTERFACE:include/>
+		${EIGEN_INCLUDE_DIR}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${JSON_INCLUDE_DIR}
+		
 )
 

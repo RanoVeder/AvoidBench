@@ -42,7 +42,7 @@
 *.VC.opendb
 
 # Assets (Large)
-Content/*
+Content/
 
 # Precompiled Assets
 SourceArt/**/*.png
@@ -63,6 +63,9 @@ Build/*/**
 # Airsim plugin
 Plugins/Airsim/*
 
+#Avoid plugin
+Plugins/Avoid/Dependencies/libs
+
 # Don't ignore icon files in Build
 !Build/**/*.ico
 
@@ -78,3 +81,4 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+tmp/

@@ -71,15 +71,18 @@ namespace avoid
                 std::cout << "## Running " << benchmarkingDescription.trials << "trial(s) for " << benchmarkingDescription.worldName << std::endl;
                 std::cout << "## Starting mission '" <<  benchmarkingDescription.missionName << "'" << std::endl;
                
+                double collisionPercentage = 0;
+
                 for (int i = 0; i < benchmarkingDescription.trials; i++)
                 {
+                    std::cout << "## Trial: '" <<  i << "'" << std::endl;
                     nlohmann::json trialResultsJson;
 
                     World world = client->LoadWorld(benchmarkingDescription.worldName);
                     for (auto &proceduralDescription : benchmarkingDescription.proceduralDecriptions)
                     {
-                        std::cout << proceduralDescription.proceduralLocation << " " << proceduralDescription.radius << std::endl;
-                        world.SetProceduralLocation(proceduralDescription.proceduralLocation, proceduralDescription.radius);
+                        std::cout << proceduralDescription.proceduralLocation << " " << proceduralDescription.radius << " " << proceduralDescription.seed  << std::endl;
+                        world.SetProceduralLocation(proceduralDescription.proceduralLocation, proceduralDescription.radius, proceduralDescription.seed);
                     }
 
                     Mission mission = world.LoadMission(benchmarkingDescription.missionName);
@@ -98,7 +101,8 @@ namespace avoid
                     std::chrono::steady_clock::time_point startTime, endTime;
                     std::chrono::milliseconds difference;
 
-                    while (mission.GetMissionState() != MissionState::ENDED)
+                    auto missionState = mission.GetMissionState();
+                    while ( !(missionState == MissionState::ENDED || missionState == MissionState::FAILED))
                     {
                         MissionInfo info = mission.GetMissionInfo();
                         startTime = std::chrono::steady_clock::now();
@@ -106,10 +110,16 @@ namespace avoid
                         endTime = std::chrono::steady_clock::now();
                         difference = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime);
                         runningTimeData.push_back(difference.count());
+                        missionState = mission.GetMissionState();
                     }
 
                     //cleanup user values
                     Cleanup();
+
+                    if(missionState == MissionState::FAILED)
+                        collisionPercentage++;
+
+                    trialResultsJson["MissionStatus"] = missionState == MissionState::FAILED ? "Failed" : "Completed";
                     trialResultsJson["AlgorithmRuntimeMean"] = CalculateMean(runningTimeData);
                     trialResultsJson["AlgorithmRuntimeSTD"] = CalculateSTD(runningTimeData);
                     trialResultsJson["Metrics"] = nlohmann::json::parse(mission.GetMetricResults());
@@ -117,7 +127,7 @@ namespace avoid
                     benchmarkingDescriptionJson["Results"].push_back(trialResultsJson);
 
                 }
-
+                benchmarkingDescriptionJson["CollisionPercentage"] = collisionPercentage / (double)benchmarkingDescription.trials;
                 benchmarkResults["Benchmarks"].push_back(benchmarkingDescriptionJson);
             }
 
@@ -175,6 +185,7 @@ namespace avoid
                 nlohmann::json proceduralDescriptionJson;
                 proceduralDescriptionJson["Location"] = proceduralDescription.proceduralLocation;
                 proceduralDescriptionJson["Radius"] = proceduralDescription.radius;
+                proceduralDescriptionJson["Seed"] = proceduralDescription.seed;
                 descriptionJson["ProceduralGenerationSettings"].push_back(proceduralDescriptionJson);
             }
 

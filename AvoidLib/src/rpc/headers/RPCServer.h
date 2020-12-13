@@ -23,7 +23,7 @@ namespace avoid
             void BindLoadWorld(std::function<bool(const std::string &)> callback);
 
             void BindGetProceduralLocations(std::function<std::vector<std::string>()> callback);
-            void BindSetProceduralLocation(std::function<void(const std::string &, float)> callback);
+            void BindSetProceduralLocation(std::function<void(const std::string &, float, int)> callback);
 
             void BindGetAvailableCameras(std::function<std::vector<std::string>(void)> callback);
             void BindSetCameraSettings(std::function<void(std::string, float)> callback);

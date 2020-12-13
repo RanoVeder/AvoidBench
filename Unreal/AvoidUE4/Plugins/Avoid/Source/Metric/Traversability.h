@@ -35,8 +35,18 @@ public:
 	UPROPERTY(EditAnywhere)
 	float SamplesPerPosition = 16;
 
-	UFUNCTION(CallInEditor, BlueprintCallable)
-	void SamplePosition();
+	UPROPERTY(EditAnywhere)
+	float DroneDiameter = 50;
+
+
+	UFUNCTION(BlueprintCallable)
+	float SampleIndividualLocation(const FVector &Position, bool Debug);
+
+	UFUNCTION(CallInEditor)
+	void CalculateTraversabilityDebug();
+
+	UFUNCTION(CallInEditor)
+	void ClearDebugLines();
 
 protected:
 	// Called when the game starts or when spawned
@@ -45,6 +55,6 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	bool running = false;
+	bool IsInitialised = false;
 	float Traversability = 0;
 };

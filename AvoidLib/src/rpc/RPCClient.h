@@ -21,7 +21,7 @@ namespace avoid
             bool LoadWorld(const std::string &worldName);
 
             std::vector<std::string> GetProceduralLocations();
-            void SetProceduralLocation(std::string &location, float radius);
+            void SetProceduralLocation(std::string &location, float radius, int seed);
 
             //image API
             std::vector<std::string> GetAvailableCameras();

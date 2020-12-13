@@ -15,40 +15,102 @@ ATraversability::ATraversability()
 
 bool ATraversability::Init(const FVector &start, const FVector &end)
 {
+	AMetricBase::Init(start, end);
+	FlushPersistentDebugLines(GetWorld());
+	Traversability = 0;
 
-	//StartLocation = start;
-	//EndLocation = end;
+	if (GetWorld() == nullptr || MeasureArea == nullptr)
+	{
+		IsInitialised = false;
+		return false;
+	}
 
-	//UOptimalPathCalculator* calculator = NewObject<UOptimalPathCalculator>();
-	//AAvoidGameMode* GameMode = Cast<AAvoidGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	//if (GetWorld() == nullptr || calculator->Init(GetWorld(), start, end) == false)
-	//{
-	//	IsInitialised = false;
-	//	return false;
-	//}
 
-	//DroneActor = GameMode->DroneManager->GetActor();
-	//if (DroneActor == nullptr)
-	//{
-	//	IsInitialised = false;
-	//	return false;
-	//}
+	auto boundingBox = MeasureArea->GetComponentsBoundingBox();
+	FVector boundingBoxSize = boundingBox.GetSize();
 
-	//ReferenceDistance = calculator->GetPathLength();
-	//PreviousLocation = start;
-	//IsInitialised = true;
+	FVector boundingBoxMax = boundingBox.Max;
+	FVector boundingBoxMin = boundingBox.Min;
+	
+	int GridSamplesX = 1 + (boundingBoxMax.X - boundingBoxMin.X) / GridSize;
+	int GridSamplesY = 1 + (boundingBoxMax.Y - boundingBoxMin.Y) / GridSize;
+	int GridSamples = GridSamplesX * GridSamplesY;
+
+
+	FVector SampleLocation;
+
+	for (int x = 0; x < GridSamplesX; x++)
+	{
+		for (int y = 0; y < GridSamplesY; y++)
+		{
+			SampleLocation = boundingBoxMin + FVector(x * GridSize, y * GridSize, -1);
+			Traversability += SampleIndividualLocation(SampleLocation, false);
+		}
+	}
+
+	Traversability /= ( DroneDiameter * (float)GridSamples);
+	IsInitialised = true;
+
 	return true;
 }
 
-void ATraversability::SamplePosition()
+
+void ATraversability::CalculateTraversabilityDebug()
+{
+	FlushPersistentDebugLines(GetWorld());
+	Traversability = 0;
+
+	if (GetWorld() == nullptr || MeasureArea == nullptr)
+	{
+		IsInitialised = false;
+		return;
+	}
+
+
+	auto boundingBox = MeasureArea->GetComponentsBoundingBox();
+	FVector boundingBoxSize = boundingBox.GetSize();
+
+	FVector boundingBoxMax = boundingBox.Max;
+	FVector boundingBoxMin = boundingBox.Min;
+
+	int GridSamplesX = 1 + (boundingBoxMax.X - boundingBoxMin.X) / GridSize;
+	int GridSamplesY = 1 + (boundingBoxMax.Y - boundingBoxMin.Y) / GridSize;
+	int GridSamples = GridSamplesX * GridSamplesY;
+
+
+	FVector SampleLocation;
+
+	for (int x = 0; x < GridSamplesX; x++)
+	{
+		for (int y = 0; y < GridSamplesY; y++)
+		{
+			SampleLocation = boundingBoxMin + FVector(x * GridSize, y * GridSize, 0);
+			Traversability += SampleIndividualLocation(SampleLocation, true);
+		}
+	}
+
+	Traversability /= (DroneDiameter * (float)GridSamples);
+
+	UE_LOG(LogTemp, Warning, TEXT("Traversability: %f"), Traversability);
+
+
+}
+
+void ATraversability::ClearDebugLines()
+{
+	FlushPersistentDebugLines(GetWorld());
+}
+
+
+float ATraversability::SampleIndividualLocation(const FVector& Position, bool Debug)
 {
 	FHitResult Hit;
 	float SampleTraversability = 0;
 
-	FVector StartLocation = GetActorLocation();
+	FVector StartLocation = Position;
 	float AngleDelta = 2 * PI / (float)SamplesPerPosition;
 
-	FlushPersistentDebugLines(GetWorld());
+	
 
 	for (int i = 0; i < SamplesPerPosition; i++)
 	{
@@ -56,47 +118,56 @@ void ATraversability::SamplePosition()
 		FVector EndLocation = StartLocation + DirectionUnitVector * MaxRayLength;
 
 		FCollisionQueryParams CollisionParameters;
+		CollisionParameters.bTraceComplex = true;
 
-		GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_WorldStatic, CollisionParameters);
+		GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_WorldDynamic, CollisionParameters);
 
 		if (Hit.IsValidBlockingHit())
 		{
 			SampleTraversability += Hit.Distance;
 
-			DrawDebugLine(GetWorld(), StartLocation, Hit.Location, FColor::Green, true, -1, 0, 1.f);
+			if(Debug)
+				DrawDebugLine(GetWorld(), StartLocation, Hit.Location, FColor::Red, true, -1, 0, 1.f);
 		}
 		else
 		{
 			SampleTraversability += MaxRayLength;
-			DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, true, -1, 0, 1.f);
+			if (Debug)
+				DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, true, -1, 0, 1.f);
 		}
 	}
 
 	float res = (SampleTraversability / (float)SamplesPerPosition);
-	UE_LOG(LogTemp, Warning, TEXT("Sample: %f"), res);
-	return;
+	return res;
 }
 
 void ATraversability::Start()
 {
-	running = true;
 }
 
 void ATraversability::Stop()
 {
-	running = false;
 }
 
 void ATraversability::Reset()
 {
-	//TravelledDistance = 0;
+	Traversability = 0;
 	//PreviousLocation = StartLocation;
 }
 
 TSharedPtr<FJsonObject> ATraversability::SerializeResults()
 {
 	TSharedPtr<FJsonObject> out = MakeShareable(new FJsonObject);
-	out->SetNumberField("Traversability", Traversability);
+	if (IsInitialised)
+	{
+		out->SetNumberField("Traversability", Traversability);
+		//Convert to metric
+		out->SetNumberField("Drone Diameter", DroneDiameter/100.0);
+	}
+	else
+	{
+		out->SetStringField("Error", "Failed to initialise the Traversability Metric");
+	}
 	return out;
 }
 
@@ -111,11 +182,4 @@ void ATraversability::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (running)
-	{
-		/*	if (IsInitialised)
-		{
-			
-		}*/
-	}
 }

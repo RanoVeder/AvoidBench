@@ -43,8 +43,7 @@ void AAvoidGameMode::StartToLeaveMap()
 
 void AAvoidGameMode::MoveToZ(float z)
 {
-
-	result = DroneManager->MoveToZ(z);
+	Result = DroneManager->MoveToZ(z);
 }
 
 void AAvoidGameMode::SetPosition(float X, float Y, float Z, float yaw)
@@ -64,7 +63,6 @@ void AAvoidGameMode::StartMission()
 
 void AAvoidGameMode::Metric()
 {
-
 	MetricManager->Init(GetWorld());
 	FString out = MetricManager->GetMetricResults();
 	UE_LOG(LogAvoid, Warning, TEXT("resulting jsonString -> %s"), *out);
@@ -75,11 +73,4 @@ void AAvoidGameMode::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	MissionManager->Tick(DeltaSeconds);
-
-	time += DeltaSeconds;
-	//if (FMath::Fmod(time, 10) < 0.01) {
-	//	UE_LOG(LogAvoid, Warning, TEXT("%d"), result.IsReady())
-	//}
-	//auto resul/*t = DroneManager->SetDroneZ(time * -1);
-	//result.*/
 }

@@ -77,29 +77,25 @@ TFuture<void> UAvoidDroneManager::MoveToZ(float z)
 
 TFuture<void> UAvoidDroneManager::RotateToYaw(float yaw)
 {
-	count.Increment();
-	TUniqueFunction<void()> Task = [=]() { BlockingRotateToYaw(yaw); count.Decrement(); };
+	TUniqueFunction<void()> Task = [=]() { BlockingRotateToYaw(yaw);};
 	return ExecuteAsync(EAsyncExecution::ThreadPool, MoveTemp(Task));
 }
 
 TFuture<void> UAvoidDroneManager::moveByThrottle(float throttle1, float throttle2, float throttle3, float throttle4)
 {
-	count.Increment();
-	TUniqueFunction<void()> Task = [=]() { BlockingmoveByThrottle(throttle1, throttle2, throttle3, throttle4); count.Decrement(); };
+	TUniqueFunction<void()> Task = [=]() { BlockingmoveByThrottle(throttle1, throttle2, throttle3, throttle4); };
 	return ExecuteAsync(EAsyncExecution::ThreadPool, MoveTemp(Task));
 }
 
 TFuture<void> UAvoidDroneManager::MoveByRollPitchYawZ(float roll, float pitch, float yaw, float z)
 {
-	count.Increment();
-	TUniqueFunction<void()> Task = [=]() { BlockingMoveByRollPitchYawZ(roll, pitch, yaw, z); count.Decrement(); };
+	TUniqueFunction<void()> Task = [=]() { BlockingMoveByRollPitchYawZ(roll, pitch, yaw, z); };
 	return ExecuteAsync(EAsyncExecution::ThreadPool, MoveTemp(Task));
 }
 
 TFuture<void> UAvoidDroneManager::MoveByAngleRatesZ(float roll_rate, float pitch_rate, float yaw_rate, float z)
 {
-	count.Increment();
-	TUniqueFunction<void()> Task = [=]() { BlockingMoveByAngleRatesZ(roll_rate, pitch_rate, yaw_rate, z); count.Decrement(); };
+	TUniqueFunction<void()> Task = [=]() { BlockingMoveByAngleRatesZ(roll_rate, pitch_rate, yaw_rate, z); };
 	return ExecuteAsync(EAsyncExecution::ThreadPool, MoveTemp(Task));
 }
 
@@ -111,8 +107,7 @@ TFuture<void> UAvoidDroneManager::MoveByVelocity(float vx, float vy, float vz, f
 
 TFuture<void> UAvoidDroneManager::MoveToPosition(float x, float y, float z, float yaw)
 {
-	count.Increment();
-	TUniqueFunction<void()> Task = [=]() { BlockingMoveToPosition(x, y, z, yaw); count.Decrement(); };
+	TUniqueFunction<void()> Task = [=]() { BlockingMoveToPosition(x, y, z, yaw); };
 	return ExecuteAsync(EAsyncExecution::ThreadPool, MoveTemp(Task));
 }
 
@@ -164,10 +159,12 @@ void UAvoidDroneManager::CancelTasks()
 	ApiBase->cancelLastTask();
 }
 
-avoid::rpc::ImageResult UAvoidDroneManager::GetImage(const std::string &cameraName)
+avoid::rpc::ImageResult UAvoidDroneManager::GetImage(std::string cameraName)
 {
 	if (SimApi == nullptr)
+	{
 		return avoid::rpc::ImageResult();
+	}
 	std::vector<ImageCaptureBase::ImageRequest> requests{ImageCaptureBase::ImageRequest(cameraName, ImageCaptureBase::ImageType::Scene, false, false)};
 
 	auto result = SimApi->getImages(requests);
@@ -177,10 +174,13 @@ avoid::rpc::ImageResult UAvoidDroneManager::GetImage(const std::string &cameraNa
 	}
 	else
 	{
+		//Sometimes airsim returns empty results because it is unable to obtain a world handle from the camera. I currently have no clue what causes this. Make sure to check if image is empty
 		auto avoidImageResult = avoid::rpc::ImageResult();
+		
 		avoidImageResult.width = result[0].width;
 		avoidImageResult.height = result[0].height;
 		avoidImageResult.data = result[0].image_data_uint8;
+
 		return avoidImageResult;
 	}
 }
@@ -264,7 +264,6 @@ void UAvoidDroneManager::BlockingMoveByVelocity(float vx, float vy, float vz, fl
 	float vxBody = cos(yaw) * vx - sin(yaw) * vy;
 	float vyBody = sin(yaw) * vx + cos(yaw) * vy;
 	float yawDegrees = yaw * 180.0f / PI;
-	UE_LOG(LogAvoid, Warning, TEXT("vx, vy, vz, yaw: %f, %f, %f, %f"), vx, vy, vz, yawDegrees)
 	ApiBase->moveByVelocity(vxBody, vyBody, vz, 99999, DrivetrainType::MaxDegreeOfFreedom, YawMode{false, yawDegrees});
 }
 

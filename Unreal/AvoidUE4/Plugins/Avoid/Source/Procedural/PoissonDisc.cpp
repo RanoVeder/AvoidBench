@@ -20,35 +20,41 @@ void APoissonDisc::BeginPlay()
 	Super::BeginPlay();
 }
 
-// Called every frame
-void APoissonDisc::Tick(float DeltaTime)
+void APoissonDisc::BeginDestroy()
 {
-	Super::Tick(DeltaTime);
+	Super::BeginDestroy();
+
+	for (auto instance : Instances)
+	{
+		instance->UnregisterComponent();
+		instance->DestroyComponent();
+	};
 }
+
 
 bool APoissonDisc::GenerateArray()
 {
-	if (volume == nullptr)
+	if (Volume == nullptr)
 		return false;
-	boundingBox = volume->GetComponentsBoundingBox();
-	FVector boundingBoxSize = boundingBox.GetSize();
+	BoundingBox = Volume->GetComponentsBoundingBox();
+	FVector boundingBoxSize = BoundingBox.GetSize();
 
-	gridSize = radius / FMath::Sqrt(2);
-	rows = FMath::CeilToInt(boundingBoxSize.X / gridSize);
-	columns = FMath::CeilToInt(boundingBoxSize.Y / gridSize);
+	GridSize = Radius / FMath::Sqrt(2);
+	Rows = FMath::CeilToInt(boundingBoxSize.X / GridSize);
+	Columns = FMath::CeilToInt(boundingBoxSize.Y / GridSize);
 
-	if (rows == 0 || columns == 0)
+	if (Rows == 0 || Columns == 0)
 		return false;
 
-	grid.Init(-1, rows * columns);
-	locations.Empty(rows * columns);
+	Grid.Init(-1, Rows * Columns);
+	Locations.Empty(Rows * Columns);
 	return true;
 }
 
 void APoissonDisc::GenerateLocations()
 {
-	FVector boundingBoxMax = boundingBox.Max;
-	FVector boundingBoxMin = boundingBox.Min;
+	FVector boundingBoxMax = BoundingBox.Max;
+	FVector boundingBoxMin = BoundingBox.Min;
 
 	FVector2D initial;
 	initial.X = FMath::RandRange(boundingBoxMin.X, boundingBoxMax.X);
@@ -57,29 +63,29 @@ void APoissonDisc::GenerateLocations()
 	int row, column;
 	GetGridBox(initial, row, column);
 
-	locations.Add(initial);
-	activePoints.Add(initial);
-	grid[row * columns + column] = 0;
+	Locations.Add(initial);
+	ActivePoints.Add(initial);
+	Grid[row * Columns + column] = 0;
 
-	while (activePoints.Num() != 0)
+	while (ActivePoints.Num() != 0)
 	{
-		int index = FMath::RandRange(0, activePoints.Num() - 1);
-		FVector2D currentPoint = activePoints[index];
+		int index = FMath::RandRange(0, ActivePoints.Num() - 1);
+		FVector2D currentPoint = ActivePoints[index];
 
 		bool foundCandidate = false;
 
-		for (int i = 0; i < iterations; i++)
+		for (int i = 0; i < Iterations; i++)
 		{
-
-			FVector2D randomInCircle = FMath::RandPointInCircle(radius);
-			FVector2D candidate = currentPoint + (randomInCircle + FMath::RandRange(0.0f, 1.0f) * (randomInCircle * 2 - randomInCircle));
+			float angle = FMath::RandRange(0.0, 2 * PI);
+			FVector2D direction(cos(angle), sin(angle));
+			FVector2D candidate = currentPoint + direction * FMath::RandRange(Radius, 2*Radius);
 
 			if (IsValid(candidate))
 			{
-				locations.Add(candidate);
-				activePoints.Add(candidate);
+				Locations.Add(candidate);
+				ActivePoints.Add(candidate);
 				GetGridBox(candidate, row, column);
-				grid[row * columns + column] = locations.Num() - 1;
+				Grid[row * Columns + column] = Locations.Num() - 1;
 				foundCandidate = true;
 				break;
 			}
@@ -87,7 +93,7 @@ void APoissonDisc::GenerateLocations()
 
 		if (!foundCandidate)
 		{
-			activePoints.RemoveAt(index);
+			ActivePoints.RemoveAt(index);
 		}
 	}
 }
@@ -96,7 +102,7 @@ void APoissonDisc::PlaceInstances()
 {
 	//FPotentialInstance PotentialInstance = PotentialInstances[Idx];/*;*/
 	TArray<FDesiredFoliageInstance> desiredInstances;
-	desiredInstances.Reserve(locations.Num());
+	desiredInstances.Reserve(Locations.Num());
 
 	UWorld *world = GetWorld();
 	if (world == nullptr)
@@ -106,13 +112,13 @@ void APoissonDisc::PlaceInstances()
 	if (level == nullptr)
 		return;
 
-	for (auto &point : locations)
+	for (auto &point : Locations)
 	{
 
 		FDesiredFoliageInstance desiredInstance;
 
 		int index = FMath::RandRange(0, FoliageTypes.Num() - 1);
-		FVector StartTrace = FVector(point, boundingBox.Max.Z);
+		FVector StartTrace = FVector(point, BoundingBox.Max.Z);
 		FVector EndTrace = FVector(point, -1e6);
 
 		desiredInstance.FoliageType = FoliageTypes[index];
@@ -135,7 +141,7 @@ void APoissonDisc::PlaceInstances()
 		if (PlaceInstance(world, desiredInstance.FoliageType, Inst, Hit.ImpactPoint, Hit.ImpactNormal))
 		{
 			UFoliageType_InstancedStaticMesh *cl = FoliageTypes[index];
-			UFoliageInstancedStaticMeshComponent *component = instances[index];
+			UFoliageInstancedStaticMeshComponent *component = Instances[index];
 			FTransform transform = Inst.GetInstanceWorldTransform();
 			component->AddInstanceWorldSpace(transform);
 			//UClass* aaa = cl->GetComponentClass();
@@ -148,34 +154,36 @@ void APoissonDisc::PlaceInstances()
 
 bool APoissonDisc::IsValid(FVector2D point)
 {
-	FVector boundingBoxMax = boundingBox.Max;
-	FVector boundingBoxMin = boundingBox.Min;
+	FVector boundingBoxMax = BoundingBox.Max;
+	FVector boundingBoxMin = BoundingBox.Min;
 
 	int row, column;
 
 	bool isValid = false;
 
-	if (boundingBox.IsInsideXY(FVector(point, 0)))
+	if (BoundingBox.IsInsideXY(FVector(point, 0)))
 	{
 		GetGridBox(point, row, column);
 
+
+		//Check if there already exists a sample in the current gridbox
 		int startX = FMath::Max(0, row - 2);
-		int endX = FMath::Min(rows - 1, row + 2);
+		int endX = FMath::Min(Rows - 1, row + 2);
 		int startY = FMath::Max(0, column - 2);
-		int endY = FMath::Min(columns - 1, column + 2);
+		int endY = FMath::Min(Columns - 1, column + 2);
 
 		for (int x = startX; x <= endX; x++)
 		{
 			for (int y = startY; y <= endY; y++)
 			{
-				int comparisonIndex = grid[columns * x + y];
+				int comparisonIndex = Grid[Columns * x + y];
 				if (comparisonIndex == -1)
 				{
 					continue;
 				}
-				FVector2D comparisonPoint = locations[comparisonIndex];
+				FVector2D comparisonPoint = Locations[comparisonIndex];
 				float distance = (comparisonPoint - point).SizeSquared();
-				if (distance < (radius * radius))
+				if (distance < (Radius * Radius))
 				{
 					return false;
 				}
@@ -189,9 +197,9 @@ bool APoissonDisc::IsValid(FVector2D point)
 
 void APoissonDisc::GetGridBox(FVector2D location, int &row, int &column)
 {
-	FVector boundingBoxMin = boundingBox.Min;
-	row = FMath::FloorToInt((location.X - boundingBoxMin.X) / gridSize);
-	column = FMath::FloorToInt((location.Y - boundingBoxMin.Y) / gridSize);
+	FVector boundingBoxMin = BoundingBox.Min;
+	row = FMath::FloorToInt((location.X - boundingBoxMin.X) / GridSize);
+	column = FMath::FloorToInt((location.Y - boundingBoxMin.Y) / GridSize);
 }
 
 void APoissonDisc::Generate()
@@ -202,19 +210,19 @@ void APoissonDisc::Generate()
 		return;
 	};
 
-	if (volume == nullptr)
+	if (Volume == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("No Volume Specified"))
 		return;
 	};
 	UE_LOG(LogTemp, Warning, TEXT("RUNNING"))
-	FMath::RandInit(randomSeed);
+	FMath::RandInit(RandomSeed);
 
-	if (oldTypes != FoliageTypes)
+	if (OldTypes != FoliageTypes)
 	{
-		oldTypes = FoliageTypes;
+		OldTypes = FoliageTypes;
 
-		for (auto instance : instances)
+		for (auto instance : Instances)
 		{
 			instance->UnregisterComponent();
 			instance->DestroyComponent();
@@ -233,7 +241,7 @@ void APoissonDisc::Generate()
 			component->RegisterComponent();
 			component->SetStaticMesh(type->GetStaticMesh());
 			component->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
-			instances.Add(component);
+			Instances.Add(component);
 			//UClass* aaa = type->GetComponentClass();
 
 			//UFoliageInstancedStaticMeshComponent* comp = aaa->GetDefaultObject< UFoliageInstancedStaticMeshComponent>();
@@ -241,7 +249,7 @@ void APoissonDisc::Generate()
 		}
 	}
 
-	for (UFoliageInstancedStaticMeshComponent *instance : instances)
+	for (UFoliageInstancedStaticMeshComponent *instance : Instances)
 	{
 		instance->ClearInstances();
 	};
@@ -255,6 +263,8 @@ void APoissonDisc::Generate()
 	UE_LOG(LogTemp, Warning, TEXT("Done"))
 };
 
+
+//Unreal engine code
 bool APoissonDisc::FoliageTrace(const UWorld *InWorld, FHitResult &OutHit, const FDesiredFoliageInstance &DesiredInstance)
 {
 	FCollisionQueryParams QueryParams(FName(TEXT("AddFoliageInstances")), SCENE_QUERY_STAT_ONLY(IFA_FoliageTrace), true);

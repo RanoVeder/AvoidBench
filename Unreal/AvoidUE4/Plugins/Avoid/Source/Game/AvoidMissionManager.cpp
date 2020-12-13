@@ -72,8 +72,6 @@ void UAvoidMissionManager::Tick(float DeltaSeconds)
 				DroneManager->SetPosition(StartLocation, yaw);
 
 				DroneManager->EnableControl();
-				//Initializing = DroneManager->BlockingMoveToZ(StartLocation.Z);
-				//DroneManager->MoveToZ(StartLocation.Z + 10);
 				DroneManager->MoveByVelocity(0, 0, 0, yaw);
 				DroneManager->DisableControl();
 
@@ -85,19 +83,13 @@ void UAvoidMissionManager::Tick(float DeltaSeconds)
 					LevelOverviewFocus = false;
 				}
 
-				MetricManager->InitMetrics(StartLocation, EndLocation);
 				MetricManager->ResetMetrics();
+				MetricManager->InitMetrics(StartLocation, EndLocation);
 			}
 		}
 		CurrentState = EMissionState::Ready;
-
-		//if (Initializing.IsReady())
-		//{
-		//	UE_LOG(LogAvoid, Warning, TEXT("Mission Ready"))
-		//	CurrentState = EMissionState::Ready;
-		//}
-
 		break;
+
 	case EMissionState::Ready:
 		if (MissionShouldStart)
 		{
@@ -114,29 +106,30 @@ void UAvoidMissionManager::Tick(float DeltaSeconds)
 
 		if (DroneManager->HasCollisionOccured())
 		{
-			CurrentState = EMissionState::Ended;
 			UE_LOG(LogAvoid, Warning, TEXT("Collision Has occured"))
 			DroneManager->DisableControl();
-
 			MetricManager->StopMetrics();
+
+			CurrentState = EMissionState::Failed;
 		}
 
 		if (HasReachedFinish())
 		{
-			CurrentState = EMissionState::Ended;
 			UE_LOG(LogAvoid, Warning, TEXT("%f"), MissionTimer)
 			DroneManager->DisableControl();
 
 			MetricManager->StopMetrics();
+
+			CurrentState = EMissionState::Ended;
 		}
 
 		if (MissionTimer >= CurrentMission->MaxMissionTime)
 		{
-			CurrentState = EMissionState::Ended;
 			UE_LOG(LogAvoid, Warning, TEXT("Exceeded maximum mission time"), MissionTimer)
 			DroneManager->DisableControl();
-
 			MetricManager->StopMetrics();
+
+			CurrentState = EMissionState::Failed;
 		}
 
 		break;
@@ -153,7 +146,7 @@ EMissionState UAvoidMissionManager::GetMissionState()
 
 bool UAvoidMissionManager::IsComplete()
 {
-	if (CurrentState == EMissionState::Ended)
+	if (CurrentState == EMissionState::Ended || CurrentState == EMissionState::Failed)
 	{
 		return true;
 	}
@@ -191,16 +184,16 @@ float UAvoidMissionManager::GetMissionTime()
 
 bool UAvoidMissionManager::LoadMission(const FString &MissionName)
 {
-	//ensure only tasks can be loaded while in not running stastes..
 	UE_LOG(LogAvoid, Warning, TEXT("Loading mission: %s"), *MissionName)
 	bool FoundActor = false;
 	TArray<AActor *> AllActors;
 
 	UGameplayStatics::GetAllActorsOfClass(World, AAvoidMission::StaticClass(), AllActors);
 
+	UE_LOG(LogAvoid, Warning, TEXT("Found %d Missions."), AllActors.Num())
+
 	for (auto Actor : AllActors)
 	{
-		UE_LOG(LogAvoid, Warning, TEXT("%s"), *Actor->GetHumanReadableName())
 		if (Actor->GetHumanReadableName() == MissionName)
 		{
 			CurrentMission = Cast<AAvoidMission>(Actor);
@@ -209,6 +202,8 @@ bool UAvoidMissionManager::LoadMission(const FString &MissionName)
 			break;
 		};
 	}
+
+	UE_LOG(LogAvoid, Warning, TEXT("Finished Loading mission."))
 
 	return FoundActor;
 }

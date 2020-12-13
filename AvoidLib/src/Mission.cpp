@@ -25,6 +25,8 @@ namespace avoid
         case 3:
             return MissionState::RUNNING;
         case 4:
+            return MissionState::FAILED;
+        case 5:
             return MissionState::ENDED;
         default:
             return MissionState::INVALIDSTATE;

@@ -23,6 +23,6 @@ private:
 	bool GetOptimalPathLength(UWorld *World, const FVector &start, const FVector &end);
 
 private:
-	bool initialised = false;
+	bool Initialised = false;
 	FPathFindingResult PathResult;
 };

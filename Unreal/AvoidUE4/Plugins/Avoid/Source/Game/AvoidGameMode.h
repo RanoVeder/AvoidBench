@@ -58,7 +58,7 @@ private:
     UPROPERTY()
     UAvoidGameInstance *GameInstance;
 
-    TFuture<void> result;
+    TFuture<void> Result;
 
     float time = 0;
 };

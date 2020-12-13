@@ -35,15 +35,12 @@ namespace avoid
     ImageResult Vehicle::GetImage(std::string &cameraName)
     {
         ImageResult result;
-    //    auto start = std::chrono::steady_clock::now();
         auto a =  backend->GetImage(cameraName);
-    //    auto end = std::chrono::steady_clock::now();
+        
         result.width = a.width;
         result.height = a.height;
         result.data = a.data;
 
-    // std::chrono::duration<double> elapsed_seconds = end-start;
-    // std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
         return result;
     }
     

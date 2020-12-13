@@ -29,7 +29,7 @@ namespace avoid
             server.bind(GET_PROCEDURAL_LOCATIONS, callback);
         };
 
-        void RPCServer::BindSetProceduralLocation(std::function<void(const std::string &, float)> callback)
+        void RPCServer::BindSetProceduralLocation(std::function<void(const std::string &, float, int)> callback)
         {
             server.bind(SET_PROCEDURAL_LOCATION, callback);
         };

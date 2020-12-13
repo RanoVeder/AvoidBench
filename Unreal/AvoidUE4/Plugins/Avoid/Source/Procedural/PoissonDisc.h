@@ -19,10 +19,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void BeginDestroy() override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+
+	TArray<FVector2D> GetObstacleLocations() const { return Locations; };
 
 	UFUNCTION(CallInEditor, BlueprintCallable)
 	void Generate();
@@ -31,16 +32,16 @@ public:
 	TArray<UFoliageType_InstancedStaticMesh *> FoliageTypes;
 
 	UPROPERTY(EditAnywhere)
-	AVolume *volume;
+	AVolume *Volume;
 
 	UPROPERTY(EditAnywhere)
-	float radius = 200;
+	float Radius = 200;
 
 	UPROPERTY(EditAnywhere)
-	int iterations = 35;
+	int Iterations = 35;
 
 	UPROPERTY(EditAnywhere)
-	int randomSeed = 0;
+	int RandomSeed = 0;
 
 private:
 	bool FoliageTrace(const UWorld *InWorld, FHitResult &OutHit, const FDesiredFoliageInstance &DesiredInstance);
@@ -53,17 +54,15 @@ private:
 	void GetGridBox(FVector2D location, int &row, int &column);
 	bool IsValid(FVector2D point);
 
-	TArray<int> grid;
-	TArray<FVector2D> locations;
-	TArray<FVector2D> activePoints;
-	FBox boundingBox;
+	TArray<int> Grid;
+	TArray<FVector2D> Locations;
+	TArray<FVector2D> ActivePoints;
+	FBox BoundingBox;
 
-	TArray<UFoliageType_InstancedStaticMesh *> oldTypes;
-	TArray<UFoliageInstancedStaticMeshComponent *> instances;
-	int counter = 0;
+	TArray<UFoliageType_InstancedStaticMesh *> OldTypes;
+	TArray<UFoliageInstancedStaticMeshComponent *> Instances;
 
-	int currentIndex;
-	int rows;
-	int columns;
-	float gridSize;
+	int Rows;
+	int Columns;
+	float GridSize;
 };

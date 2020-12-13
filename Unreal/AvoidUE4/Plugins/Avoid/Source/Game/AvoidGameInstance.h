@@ -30,5 +30,5 @@ protected:
 	virtual void OnStart() override;
 
 private:
-	Server *server;
+	Server *RPCServer;
 };

@@ -3,16 +3,17 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Metric/MetricBase.h"
-#include "AdjustedGoalTime.generated.h"
+#include "Procedural/PoissonDisc.h"
+#include "LocationLogger.generated.h"
 
 UCLASS()
-class AVOID_API AAdjustedGoalTime : public AMetricBase
+class AVOID_API ALocationLogger : public AMetricBase
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	AAdjustedGoalTime();
+	ALocationLogger();
 
 public:
 	virtual bool Init(const FVector &start, const FVector &end) override;
@@ -21,7 +22,7 @@ public:
 	virtual void Reset() override;
 	virtual TSharedPtr<FJsonObject> SerializeResults() override;
 
-	virtual FString GetMetricName() override { return "AdjustedGoalTime"; };
+	virtual FString GetMetricName() override { return "LocationLogger"; };
 
 protected:
 	// Called when the game starts or when spawned
@@ -31,8 +32,14 @@ protected:
 
 private:
 	bool IsInitialised = false;
-	bool Running = false;
+	bool IsRunning = false;
+	double Time = 0;
+	
+	UPROPERTY()
+	AActor* DroneActor;
 
-	double MissionTime = 0;
-	double ReferenceDistance = 1;
+	UPROPERTY()
+	APoissonDisc* ProceduralLocation;
+	
+	TArray<FVector> PositionArray;
 };

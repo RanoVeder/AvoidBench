@@ -4,12 +4,12 @@
 UAvoidGameInstance::UAvoidGameInstance(const FObjectInitializer &object)
 {
 	LevelManager = CreateDefaultSubobject<UAvoidLevelManager>(TEXT("AvoidLevelManager"));
-	server = new Server();
+	RPCServer = new Server();
 }
 
 UAvoidGameInstance::~UAvoidGameInstance()
 {
-	delete server;
+	delete RPCServer;
 }
 
 void UAvoidGameInstance::Init()
@@ -21,13 +21,13 @@ void UAvoidGameInstance::Init()
 void UAvoidGameInstance::OnStart()
 {
 	Super::OnStart();
-	server->Start(8090);
+	RPCServer->Start(8090);
 	UE_LOG(LogAvoid, Warning, TEXT("ONSTART"))
 };
 
 void UAvoidGameInstance::Shutdown()
 {
-	server->Stop();
+	RPCServer->Stop();
 	Super::Shutdown();
 };
 
@@ -35,12 +35,12 @@ void UAvoidGameInstance::LoadComplete(const float LoadTime, const FString &MapNa
 {
 	Super::LoadComplete(LoadTime, MapName);
 	UE_LOG(LogAvoid, Warning, TEXT("Load Complete"));
-	server->WorldLoadingFinished();
+	RPCServer->WorldLoadingFinished();
 }
 
 void UAvoidGameInstance::OnWorldChanged(UWorld *OldWorld, UWorld *NewWorld)
 {
 	Super::OnWorldChanged(OldWorld, NewWorld);
 	UE_LOG(LogAvoid, Warning, TEXT("OldWorld: %p,  NewWorld: %p"), OldWorld, NewWorld);
-	server->SetWorld(NewWorld);
+	RPCServer->SetWorld(NewWorld);
 }

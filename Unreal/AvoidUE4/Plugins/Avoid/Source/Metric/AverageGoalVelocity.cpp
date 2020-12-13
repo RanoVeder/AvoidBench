@@ -1,16 +1,16 @@
-#include "AdjustedGoalTime.h"
+#include "AverageGoalVelocity.h"
 #include "Util/OptimalPathCalculator.h"
 #include "Game/AvoidGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "DrawDebugHelpers.h"
 
-AAdjustedGoalTime::AAdjustedGoalTime()
+AAverageGoalVelocity::AAverageGoalVelocity()
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-bool AAdjustedGoalTime::Init(const FVector &start, const FVector &end)
+bool AAverageGoalVelocity::Init(const FVector &start, const FVector &end)
 {
 
 	StartLocation = start;
@@ -29,23 +29,23 @@ bool AAdjustedGoalTime::Init(const FVector &start, const FVector &end)
 	return true;
 }
 
-void AAdjustedGoalTime::Start()
+void AAverageGoalVelocity::Start()
 {
 	Running = true;
 }
 
-void AAdjustedGoalTime::Stop()
+void AAverageGoalVelocity::Stop()
 {
 	Running = false;
 }
 
-void AAdjustedGoalTime::Reset()
+void AAverageGoalVelocity::Reset()
 {
 	ReferenceDistance = 0;
 	MissionTime = 0;
 }
 
-TSharedPtr<FJsonObject> AAdjustedGoalTime::SerializeResults()
+TSharedPtr<FJsonObject> AAverageGoalVelocity::SerializeResults()
 {
 	TSharedPtr<FJsonObject> Out = MakeShareable(new FJsonObject);
 	if (IsInitialised)
@@ -58,22 +58,22 @@ TSharedPtr<FJsonObject> AAdjustedGoalTime::SerializeResults()
 		{
 			Out->SetNumberField("MissionTime", MissionTime);
 			Out->SetNumberField("ReferenceDistance", ReferenceDistance);
-			Out->SetNumberField("AdjustedGoalTime", MissionTime / ReferenceDistance);
+			Out->SetNumberField("AverageGoalVelocity", ReferenceDistance/MissionTime);
 		}
 	}
 	else
 	{
-		Out->SetStringField("Error", TEXT("Failed to initialize the 'AAdjustedGoalTime' Metric."));
+		Out->SetStringField("Error", TEXT("Failed to initialize the 'AverageGoalVelocity' Metric."));
 	}
 	return Out;
 }
 
-void AAdjustedGoalTime::BeginPlay()
+void AAverageGoalVelocity::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void AAdjustedGoalTime::Tick(float DeltaTime)
+void AAverageGoalVelocity::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

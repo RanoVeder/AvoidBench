@@ -154,7 +154,8 @@ void register_benchmarking_interface(py::module &m)
     py::class_<avoid::benchmarking::ProceduralGenerationDescription>(m, "ProceduralGenerationDescription")
         .def(py::init<>())
         .def_readwrite("procedural_location", &avoid::benchmarking::ProceduralGenerationDescription::proceduralLocation)
-        .def_readwrite("radius", &avoid::benchmarking::ProceduralGenerationDescription::radius);
+        .def_readwrite("radius", &avoid::benchmarking::ProceduralGenerationDescription::radius)
+        .def_readwrite("seed", &avoid::benchmarking::ProceduralGenerationDescription::seed);
 
     py::class_<avoid::benchmarking::BenchmarkingInterface, PyBenchmarkingInterface>(m, "BenchmarkingInterface")
         .def(py::init<std::string &, uint16_t>())

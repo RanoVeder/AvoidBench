@@ -27,7 +27,14 @@ bool AOptimalityFactor::Init(const FVector &start, const FVector &end)
 		return false;
 	}
 
-	ReferenceDistance = calculator->GetPathLength();
+	AAvoidMission* currentMission = GameMode->MissionManager->GetCurrentMission();
+	if (currentMission == nullptr)
+	{
+		IsInitialised = false;
+		return false;
+	}
+
+	ReferenceDistance = calculator->GetPathLength() - currentMission->GoalRadius;
 	PreviousLocation = start;
 	IsInitialised = true;
 	return true;
@@ -47,12 +54,12 @@ float AOptimalityFactor::GetOptimalityFactor()
 
 void AOptimalityFactor::Start()
 {
-	running = true;
+	Running = true;
 }
 
 void AOptimalityFactor::Stop()
 {
-	running = false;
+	Running = false;
 }
 
 void AOptimalityFactor::Reset()
@@ -79,7 +86,7 @@ void AOptimalityFactor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (running)
+	if (Running)
 	{
 		if (IsInitialised)
 		{

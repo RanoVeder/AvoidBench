@@ -14,6 +14,7 @@ namespace avoid
         {
             std::string proceduralLocation;
             float radius;
+            int seed = 0;
         };
 
         struct BenchmarkingDescription

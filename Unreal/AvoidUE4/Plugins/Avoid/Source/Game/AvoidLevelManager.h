@@ -24,5 +24,12 @@ public:
 	void GetProceduralLocations(TArray<FString> &locations);
 
 	UFUNCTION(BlueprintCallable)
-	void SetProceduralLocation(const FString &location, float radius);
+	void SetProceduralLocation(const FString &location, float radius, int seed);
+
+	AActor* GetActiveProceduralLocation() const { return ActiveProceduralLocation; };
+
+private:
+	
+	UPROPERTY()
+	AActor* ActiveProceduralLocation = nullptr;
 };

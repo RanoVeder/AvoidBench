@@ -82,7 +82,7 @@ void UAvoidLevelManager::GetProceduralLocations(TArray<FString> &locations)
 	}
 }
 
-void UAvoidLevelManager::SetProceduralLocation(const FString &location, float radius)
+void UAvoidLevelManager::SetProceduralLocation(const FString &location, float radius, int seed)
 {
 	TArray<AActor *> Actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APoissonDisc::StaticClass(), Actors);
@@ -91,8 +91,10 @@ void UAvoidLevelManager::SetProceduralLocation(const FString &location, float ra
 		if (location == Actors[i]->GetName())
 		{
 			APoissonDisc *pd = Cast<APoissonDisc>(Actors[i]);
-			pd->radius = radius;
+			pd->Radius = radius;
+			pd->RandomSeed = seed;
 			pd->Generate();
+			ActiveProceduralLocation = Actors[i];
 			break;
 		};
 	}

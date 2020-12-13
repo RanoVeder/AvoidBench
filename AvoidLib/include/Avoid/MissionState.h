@@ -11,6 +11,7 @@ namespace avoid
         INITIALISING,
         READY,
         RUNNING,
+        FAILED,
         ENDED,
         INVALIDSTATE
     };

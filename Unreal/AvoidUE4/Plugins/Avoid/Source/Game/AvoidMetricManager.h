@@ -23,6 +23,10 @@ public:
 	FString GetMetricResults();
 
 private:
+
+	UPROPERTY()
 	UWorld *World;
+
+	UPROPERTY()
 	TArray<AMetricBase *> Metrics;
 };

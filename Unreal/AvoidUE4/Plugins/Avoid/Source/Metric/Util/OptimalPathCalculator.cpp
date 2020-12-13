@@ -11,18 +11,18 @@ bool UOptimalPathCalculator::Init(UWorld *World, const FVector &start, const FVe
 	bool val = GetOptimalPathLength(World, start, end);
 	if (val)
 	{
-		initialised = true;
+		Initialised = true;
 	}
 	else
 	{
-		initialised = false;
+		Initialised = false;
 	}
 	return val;
 }
 
 float UOptimalPathCalculator::GetPathLength()
 {
-	if (initialised)
+	if (Initialised)
 	{
 		return PathResult.Path->GetLength();
 	}

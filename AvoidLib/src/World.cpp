@@ -20,9 +20,9 @@ namespace avoid
         return backend->GetProceduralLocations();
     }
 
-    void World::SetProceduralLocation(std::string locationName, float radius)
+    void World::SetProceduralLocation(std::string locationName, float radius, int seed)
     {
-        backend->SetProceduralLocation(locationName, radius);
+        backend->SetProceduralLocation(locationName, radius, seed);
     };
 
     std::vector<std::string> World::GetAvailableMissions()

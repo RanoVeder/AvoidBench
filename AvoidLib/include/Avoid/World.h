@@ -19,7 +19,7 @@ namespace avoid
         std::string GetName();
 
         std::vector<std::string> GetProceduralLocations();
-        void SetProceduralLocation(std::string locationName, float radius);
+        void SetProceduralLocation(std::string locationName, float radius, int seed);
 
         std::vector<std::string> GetAvailableMissions();
         Mission LoadMission(std::string missionName);

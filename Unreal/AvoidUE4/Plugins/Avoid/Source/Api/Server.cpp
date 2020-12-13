@@ -93,10 +93,10 @@ void Server::BindCallbacks()
 		return returnResults;
 	});
 
-	server->BindSetProceduralLocation([this](const std::string &location, float radius) {
+	server->BindSetProceduralLocation([this](const std::string &location, float radius, int seed) {
 		UAvoidGameInstance *GameInstance = Cast<UAvoidGameInstance>(UGameplayStatics::GetGameInstance(World));
 		checkf(GameInstance != nullptr, TEXT("Set UAvoidGameInstance as default in project settings."));
-		TFunction<void()> Task = [&]() { GameInstance->LevelManager->SetProceduralLocation(UTF8_TO_TCHAR(location.c_str()), radius); };
+		TFunction<void()> Task = [&]() { GameInstance->LevelManager->SetProceduralLocation(UTF8_TO_TCHAR(location.c_str()), radius, seed); };
 
 		FGraphEventRef task = FFunctionGraphTask::CreateAndDispatchWhenReady(MoveTemp(Task), TStatId(), nullptr, ENamedThreads::GameThread);
 		FTaskGraphInterface::Get().WaitUntilTaskCompletes(task);
@@ -168,7 +168,8 @@ void Server::BindCallbacks()
 		AAvoidGameMode *GameMode = Cast<AAvoidGameMode>(UGameplayStatics::GetGameMode(World));
 		checkf(GameMode != nullptr, TEXT("Did you enable the right gamemode?"));
 
-		return GameMode->DroneManager->GetImage(cameraName);
+		auto result = GameMode->DroneManager->GetImage(cameraName);
+		return result;
 	});
 
 	server->BindGetAvailableMissions([this]() -> std::vector<std::string> {

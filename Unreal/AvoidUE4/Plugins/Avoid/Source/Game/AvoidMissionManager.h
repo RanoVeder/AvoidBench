@@ -16,6 +16,7 @@ enum class EMissionState
 	Initialise,
 	Ready,
 	Running,
+	Failed,
 	Ended
 };
 
@@ -65,11 +66,20 @@ private:
 	float MissionTimer;
 
 	TAtomic<EMissionState> CurrentState;
-	AAvoidMission *CurrentMission;
-	AActor *LastViewTarget;
 
+	UPROPERTY()
+	AAvoidMission *CurrentMission;
+
+	UPROPERTY()
+	AActor *LastViewTarget;
+	
+	UPROPERTY()
 	UWorld *World;
+
+	UPROPERTY()
 	UAvoidDroneManager *DroneManager;
+	
+	UPROPERTY()
 	UAvoidMetricManager *MetricManager;
 
 	FThreadSafeBool LevelOverviewFocus = false;
@@ -77,6 +87,4 @@ private:
 	FThreadSafeBool IsInitializing = false;
 	FThreadSafeBool MissionShouldStart = false;
 	TFuture<void> Initializing;
-
-	bool bIsInitializingDone = false;
 };

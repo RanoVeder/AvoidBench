@@ -31,9 +31,9 @@ namespace avoid
             return client.call(GET_PROCEDURAL_LOCATIONS).as<std::vector<std::string>>();
         }
 
-        void RPCClient::SetProceduralLocation(std::string &location, float radius)
+        void RPCClient::SetProceduralLocation(std::string &location, float radius, int seed)
         {
-            client.call(SET_PROCEDURAL_LOCATION, location, radius);
+            client.call(SET_PROCEDURAL_LOCATION, location, radius, seed);
         }
 
         std::vector<std::string> RPCClient::GetAvailableCameras()

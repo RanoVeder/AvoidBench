@@ -47,7 +47,7 @@ public:
 	//TODO: Don't use avoidlib structs in UE4 code, should only be used in server.cpp to prevent unwanted dependencies
 	avoid::rpc::DroneState GetState();
 
-	avoid::rpc::ImageResult GetImage(const std::string &cameraName);
+	avoid::rpc::ImageResult GetImage(std::string cameraName);
 	std::vector<std::string> GetAvailableCameras();
 	void SetCameraSettings(const std::string &cameraName, float fov);
 
@@ -74,9 +74,10 @@ private:
 private:
 	bool ControlEnabled = false;
 
+	UPROPERTY()
 	UWorld *World;
+
 	msr::airlib::MultirotorApiBase *ApiBase;
 	class MultirotorPawnSimApi *SimApi;
 	class ASimModeWorldMultiRotor *WorldApi;
-	FThreadSafeCounter count = 0;
 };

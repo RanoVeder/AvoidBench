@@ -26,7 +26,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/RanoVeder/AvoidBench">
-    <img src="https://i.imgur.com/RJfAOyV.jpg" alt="Logo" width="80" height="80">
+    <img src="https://i.imgur.com/RJfAOyV.jpg" alt="Logo" width="600">
   </a>
 
   <h3 align="center">AvoidBench</h3>

@@ -1,1 +1,4 @@
 lib/
+build/
+dist/
+avoidbench.egg-info

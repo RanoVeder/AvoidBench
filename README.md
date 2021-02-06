@@ -43,6 +43,15 @@
 
 Obstacle avoidance is an essential topic in the field of autonomous drone research. When choosing an avoidance algorithm, many different options are available, each with their advantages and disadvantages. As there is currently no consensus on testing methods, it is quite challenging to compare the performance between algorithms. In this paper, we present AvoidBench, a benchmarking suite capable of evaluating the performance of vision-based obstacle avoidance algorithms for multi-rotors in simulation. Utilising a set of performance metrics, AvoidBench assigns performance scores to obstacle avoidance algorithms by subjecting them to a series of tasks. Using both Airsim and Unreal engine under the hood, we are able to provide high-fidelity visuals and dynamics, leading to a relatively small gap between simulation and reality. AvoidBench comes included with a simple, but powerful C++ and Python API which provides functionality for procedural environment generation, custom benchmark design, and an easy-to-use framework for users to implement their own vision-based obstacle avoidance methods. Implementing an obstacle avoidance method can be done entirely in a single file, allowing anyone to share and compare their obstacle detection and avoidance algorithms with others.
 
+## Getting Started
+
+Setting up AvoidBench is relatively straightforward. To start using the software, the user will have to do the following:
+
+* [Download the latest AvoidBench simulator version](https://github.com/RanoVeder/AvoidBench/releases)
+* [Install the AvoidBench python module](https://pypi.org/project/avoidbench/) (```pip install avoidbench --user```)
+
+Once the user has downloaded both the executable and the python package, the simulator can be started by running **AvoidBench.exe**. Once ready, a python script from the **examples** folder can be executed to start interacting with the simulator.
+
 
 ### Built With
 
@@ -52,6 +61,3 @@ Obstacle avoidance is an essential topic in the field of autonomous drone resear
 
 
 <!-- GETTING STARTED -->
-## Getting Started
-
-Todo

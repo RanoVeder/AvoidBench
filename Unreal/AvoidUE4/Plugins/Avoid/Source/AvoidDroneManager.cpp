@@ -11,6 +11,9 @@ UAvoidDroneManager::UAvoidDroneManager(){
 
 };
 
+UAvoidDroneManager::~UAvoidDroneManager() {
+};
+
 void UAvoidDroneManager::Init(UWorld *world)
 {
 
@@ -36,6 +39,40 @@ AActor *UAvoidDroneManager::GetActor()
 	return FoundActors[0];
 };
 
+bool UAvoidDroneManager::AirsimInstancesValid()
+{
+
+	if (World->GetFirstPlayerController() == nullptr)
+	{
+		return false;
+	}
+
+	ASimHUD* hud = Cast<ASimHUD>(World->GetFirstPlayerController()->GetHUD());
+	if (hud == nullptr)
+	{
+		return false;
+	}
+
+	WorldApi = Cast<ASimModeWorldMultiRotor>(hud->GetSimModeBase());
+	if (WorldApi == nullptr)
+	{
+		return false;
+	}
+
+	SimApi = (MultirotorPawnSimApi*)(WorldApi->getVehicleSimApi());
+	if (SimApi == nullptr)
+	{
+		return false;
+	}
+
+	ApiBase = SimApi->getVehicleApi();
+	if (ApiBase == nullptr)
+	{
+		return false;
+	}
+	return true;
+}
+
 void UAvoidDroneManager::SetPosition(const FVector &Position, const float yaw)
 {
 	CancelTasks();
@@ -60,16 +97,20 @@ void UAvoidDroneManager::DisableControl()
 	ApiBase->cancelLastTask();
 }
 
-FVector UAvoidDroneManager::ToAirsimNED(const FVector &position)
+FVector UAvoidDroneManager::ToAirsimNED(const FVector& position)
 {
-	if (WorldApi == nullptr)
-		return FVector();
+	if (AirsimInstancesValid() == false)
+		throw std::runtime_error("Airsim instance nullptr encounterd.");
+	
 	auto NEDPosition = WorldApi->getGlobalNedTransform().toGlobalNed(position);
 	return FVector(NEDPosition.x(), NEDPosition.y(), NEDPosition.z());
 }
 
 TFuture<void> UAvoidDroneManager::MoveToZ(float z)
 {
+	if (AirsimInstancesValid() == false)
+		throw std::runtime_error("Airsim instance nullptr encounterd.");
+
 	auto NEDPosition = WorldApi->getGlobalNedTransform().toGlobalNed(FVector(0, 0, z));
 	TUniqueFunction<void()> Task = [=]() { BlockingMoveToZ(NEDPosition.z()); };
 	return ExecuteAsync(EAsyncExecution::ThreadPool, MoveTemp(Task));
@@ -161,10 +202,9 @@ void UAvoidDroneManager::CancelTasks()
 
 avoid::rpc::ImageResult UAvoidDroneManager::GetImage(std::string cameraName)
 {
-	if (SimApi == nullptr)
-	{
-		return avoid::rpc::ImageResult();
-	}
+	if (AirsimInstancesValid() == false)
+		throw std::runtime_error("aa");
+
 	std::vector<ImageCaptureBase::ImageRequest> requests{ImageCaptureBase::ImageRequest(cameraName, ImageCaptureBase::ImageType::Scene, false, false)};
 
 	auto result = SimApi->getImages(requests);
@@ -213,7 +253,7 @@ void UAvoidDroneManager::SetCameraSettings(const std::string &cameraName, float 
 
 TFuture<void> UAvoidDroneManager::ExecuteAsync(EAsyncExecution executionMode, TUniqueFunction<void()> Task)
 {
-	if (ApiBase == nullptr || !ControlEnabled)
+	if (AirsimInstancesValid() == false || !ControlEnabled)
 		return TFuture<void>();
 	//EnableApiControl();
 

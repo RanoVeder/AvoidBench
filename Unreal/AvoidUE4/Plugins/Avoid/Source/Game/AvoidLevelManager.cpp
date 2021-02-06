@@ -3,7 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Procedural/PoissonDisc.h"
 
-bool UAvoidLevelManager::LoadMap(const FString &MapName)
+bool UAvoidLevelManager::LoadMap(const FString &MapName, bool& success)
 {
 
 	FString FinalReference = MapName;
@@ -45,6 +45,7 @@ bool UAvoidLevelManager::LoadMap(const FString &MapName)
 		UE_LOG(LogAvoid, Warning, TEXT("Loading new level: %s"), *FinalReference);
 		UGameplayStatics::OpenLevel(GetWorld(), *FinalReference);
 	}
+	success = ValidMapName;
 	return ValidMapName;
 }
 

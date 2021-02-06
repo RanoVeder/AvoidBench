@@ -156,6 +156,7 @@ namespace avoid
 
         void RPCServer::Stop()
         {
+            server.close_sessions();
             server.stop();
         };
 

@@ -182,7 +182,7 @@ float UAvoidMissionManager::GetMissionTime()
 	return MissionTimer;
 }
 
-bool UAvoidMissionManager::LoadMission(const FString &MissionName)
+bool UAvoidMissionManager::LoadMission(const FString &MissionName, bool& Success)
 {
 	UE_LOG(LogAvoid, Warning, TEXT("Loading mission: %s"), *MissionName)
 	bool FoundActor = false;
@@ -203,8 +203,8 @@ bool UAvoidMissionManager::LoadMission(const FString &MissionName)
 		};
 	}
 
-	UE_LOG(LogAvoid, Warning, TEXT("Finished Loading mission."))
-
+	UE_LOG(LogAvoid, Warning, TEXT("Finished Loading mission."));
+	Success = FoundActor;
 	return FoundActor;
 }
 

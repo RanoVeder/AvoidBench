@@ -38,6 +38,7 @@ void AAvoidGameMode::StartPlay()
 void AAvoidGameMode::StartToLeaveMap()
 {
 	DroneManager->CancelTasks();
+	DroneManager->DisableControl();
 	Super::StartToLeaveMap();
 }
 
@@ -53,7 +54,8 @@ void AAvoidGameMode::SetPosition(float X, float Y, float Z, float yaw)
 
 void AAvoidGameMode::LoadTask(const FString &TaskName)
 {
-	MissionManager->LoadMission(TaskName);
+	bool success = false;
+	MissionManager->LoadMission(TaskName, success);
 }
 
 void AAvoidGameMode::StartMission()

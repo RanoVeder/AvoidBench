@@ -4,6 +4,7 @@
 #include "types/MissionInfo.h"
 #include "types/ImageResult.h"
 #include <rpc/server.h>
+#include "rpc/this_handler.h"
 #include <functional>
 
 

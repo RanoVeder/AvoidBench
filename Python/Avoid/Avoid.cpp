@@ -3,7 +3,7 @@
 #include "Client.cpp"
 #include "World.cpp"
 
-PYBIND11_MODULE(avoid, m)
+PYBIND11_MODULE(avoidbench, m)
 {
     register_client(m);
     register_world(m);

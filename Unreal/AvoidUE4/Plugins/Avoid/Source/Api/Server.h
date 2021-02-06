@@ -4,6 +4,7 @@
 #include "Templates/Atomic.h"
 #include "Templates/SharedPointer.h"
 
+
 namespace avoid
 {
 	namespace rpc
@@ -14,7 +15,6 @@ namespace avoid
 
 class AVOID_API Server
 {
-
 public:
 	Server();
 	~Server();

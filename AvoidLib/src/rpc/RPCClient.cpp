@@ -8,7 +8,7 @@ namespace avoid
     namespace rpc
     {
         RPCClient::RPCClient(const std::string &ip, uint16_t port) : client(ip, port){
-            client.set_timeout(30000);
+            client.set_timeout(10000);
         };
 
         std::string RPCClient::GetCurrentWorld()

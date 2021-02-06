@@ -26,6 +26,7 @@ class AVOID_API UAvoidDroneManager : public UObject
 
 public:
 	UAvoidDroneManager();
+	~UAvoidDroneManager();
 
 	void Init(UWorld *world);
 	AActor *GetActor();
@@ -69,6 +70,8 @@ public:
 private:
 	TFuture<void> ExecuteAsync(EAsyncExecution executionMode, TUniqueFunction<void()> Task);
 	void EnableApiControl();
+
+	bool AirsimInstancesValid();
 
 
 private:

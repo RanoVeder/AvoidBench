@@ -12,7 +12,7 @@ class AVOID_API UAvoidLevelManager : public UObject
 public:
 	//User can call this with either the map name or the entire reference.
 	UFUNCTION(BlueprintCallable)
-	bool LoadMap(const FString &Map);
+	bool LoadMap(const FString &Map, bool& success);
 
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetAvailableMaps();

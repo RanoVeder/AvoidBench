@@ -52,7 +52,7 @@ public:
 	float GetMissionTime();
 
 	UFUNCTION(BlueprintCallable, Exec)
-	bool LoadMission(const FString &MissionName);
+	bool LoadMission(const FString &MissionName, bool& success);
 
 	UFUNCTION(BlueprintCallable, Exec)
 	bool StartMission();

@@ -26,7 +26,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/RanoVeder/AvoidBench">
-    <img src="https://i.imgur.com/RJfAOyV.jpg" alt="Logo" width="80" height="80">
+    <img src="https://i.imgur.com/RJfAOyV.jpg" alt="Logo" width="600">
   </a>
 
   <h3 align="center">AvoidBench</h3>
@@ -58,6 +58,3 @@ Once the user has downloaded both the executable and the python package, the sim
 * [AirSim](https://github.com/microsoft/AirSim)
 * [Unreal Engine 4](https://www.unrealengine.com/en-US/)
 * [RPCLib](https://github.com/rpclib/rpclib)
-
-
-<!-- GETTING STARTED -->

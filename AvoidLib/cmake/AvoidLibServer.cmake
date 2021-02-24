@@ -25,9 +25,10 @@ set_target_properties(${PROJECT_NAME}_server PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Unreal/AvoidUE4/Plugins/Avoid/Dependencies/libs"
 )
 
+
 add_custom_command(TARGET ${PROJECT_NAME}_server POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${AIRSIM_ROOT}/Unreal/Plugins/AirSim/Source/AirLib/lib/x64/Release" "${CMAKE_SOURCE_DIR}/Unreal/AvoidUE4/Plugins/Avoid/Dependencies/libs"  /E/H)
+        "${AIRSIM_ROOT}/Unreal/Plugins/AirSim/Source/AirLib/lib/x64/Release" "${CMAKE_SOURCE_DIR}/Unreal/AvoidUE4/Plugins/Avoid/Dependencies/libs" )
 
 add_custom_command(TARGET ${PROJECT_NAME}_server POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
@@ -35,20 +36,21 @@ add_custom_command(TARGET ${PROJECT_NAME}_server POST_BUILD
 
 add_custom_command(TARGET ${PROJECT_NAME}_server POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/rpc/headers" "${CMAKE_SOURCE_DIR}/Unreal/AvoidUE4/Plugins/Avoid/Dependencies/include/avoid"  /E/H)
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/rpc/headers" "${CMAKE_SOURCE_DIR}/Unreal/AvoidUE4/Plugins/Avoid/Dependencies/include/avoid"  )
 
 
 add_custom_command(TARGET ${PROJECT_NAME}_server POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/rpc/headers" "${CMAKE_SOURCE_DIR}/Unreal/AvoidUE4/Plugins/Avoid/Dependencies/include/avoid"  /E/H)
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/rpc/headers" "${CMAKE_SOURCE_DIR}/Unreal/AvoidUE4/Plugins/Avoid/Dependencies/include/avoid"  )
 
 add_custom_command(TARGET ${PROJECT_NAME}_server POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/vendor/rpclib/include/rpc" "${CMAKE_SOURCE_DIR}/Unreal/AvoidUE4/Plugins/Avoid/Dependencies/include/rpc"  /E/H)
+        "${CMAKE_CURRENT_SOURCE_DIR}/vendor/rpclib/include/rpc" "${CMAKE_SOURCE_DIR}/Unreal/AvoidUE4/Plugins/Avoid/Dependencies/include/rpc" )
 				
+
 add_custom_command(TARGET ${PROJECT_NAME}_server POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/Airsim/Unreal/Plugins/AirSim" "${CMAKE_SOURCE_DIR}/Unreal/AvoidUE4/Plugins/AirSim"  /E/H)
+        "${CMAKE_SOURCE_DIR}/Airsim/Unreal/Plugins/AirSim" "${CMAKE_SOURCE_DIR}/Unreal/AvoidUE4/Plugins/AirSim")
 
 
 
